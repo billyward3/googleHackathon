@@ -9,6 +9,10 @@ export const MAP_HEIGHT = 1080;
 export const QUEUE_DOCK_POINT = { x: 90, y: 990 };
 export const MOVE_OUT_POINT   = { x: 1560, y: 90 };
 
+// Lat/lon equivalents (used by FloatingMove animations)
+export const QUEUE_DOCK_LATLNG = { lat: 42.292, lon: -83.268 };
+export const MOVE_OUT_LATLNG   = { lat: 42.458, lon: -82.920 };
+
 // Neighborhood districts — loosely correspond to Detroit's geographic zones
 // Bounds derived from actual house coordinates + 30 px padding.
 // Verified non-overlapping: each pair has a gap of ≥ 5 px.
