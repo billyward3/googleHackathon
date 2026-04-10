@@ -9,7 +9,7 @@ import { createSeedState } from "@/data/seedScenario";
 import { applyFifoStep, getNextFifoStep } from "@/lib/fifoEngine";
 import { normalizePriorityRules } from "@/lib/house-priority";
 import { getHouseholdById, getUnitById } from "@/lib/eligibility";
-import { MOVE_OUT_POINT, QUEUE_DOCK_POINT } from "@/lib/map-layout";
+import { MOVE_OUT_LATLNG, QUEUE_DOCK_LATLNG } from "@/lib/map-layout";
 import { buildSimulationMetrics } from "@/lib/metrics";
 import { buildTtcRound, applyTtcCycle, finalizeResults } from "@/lib/ttcEngine";
 import { deepClone } from "@/lib/utils";
@@ -329,8 +329,8 @@ export default function HomePage() {
           id: `depart-${original.id}-${unit.id}`,
           householdId: original.id,
           label: original.name,
-          from: { x: unit.x, y: unit.y },
-          to: MOVE_OUT_POINT,
+          from: { lat: unit.lat, lon: unit.lon },
+          to: MOVE_OUT_LATLNG,
           tone: "depart",
         },
       ]);
@@ -366,8 +366,8 @@ export default function HomePage() {
           id: `arrive-${assignee.id}-${unit.id}`,
           householdId: assignee.id,
           label: assignee.name,
-          from: QUEUE_DOCK_POINT,
-          to: { x: unit.x, y: unit.y },
+          from: QUEUE_DOCK_LATLNG,
+          to: { lat: unit.lat, lon: unit.lon },
           tone: "arrive",
         },
       ]);
@@ -494,8 +494,8 @@ export default function HomePage() {
           id: `ttc-${householdId}-${targetUnit.id}`,
           householdId,
           label: household.name,
-          from: { x: sourceUnit.x, y: sourceUnit.y },
-          to: { x: targetUnit.x, y: targetUnit.y },
+          from: { lat: sourceUnit.lat, lon: sourceUnit.lon },
+          to: { lat: targetUnit.lat, lon: targetUnit.lon },
           tone: "cycle" as const,
         };
       });

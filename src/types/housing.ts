@@ -163,7 +163,7 @@ export interface FloatingMove {
   id: string;
   householdId: string;
   label: string;
-  from: { x: number; y: number };
-  to: { x: number; y: number };
+  from: { lat: number; lon: number };
+  to: { lat: number; lon: number };
   tone: "depart" | "arrive" | "cycle";
 }
