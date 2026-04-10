@@ -1,0 +1,77 @@
+﻿X,Y,OBJECTID,site_id,site_name,address,owner_developer_name,construction_type,total_units,affordable_units
+-83.0753806543472,42.375513621038,9,HRD10137,Marwood + Marston: Preservation,53 Marston St,Develop Detroit Inc,Occupied Rehabilitation,59,59
+-82.9421648028198,42.4098641246231,19,HRD12311,The Residences at St Matthew,5970 Audubon Rd,"Catholic Charities for SE Michigan, Lighthouse MI, Ethos Development",New Construction,46,46
+-83.0819699098448,42.3622655013653,23,HRD12295,DreamTroit,1331 Holden St,"Almost Midtown, LLC",Adaptive Reuse,81,57
+-83.0633587055135,42.3450150342335,24,HRD12303,MLK on 2nd,3515 2nd Ave,MHT Housing,New Construction,33,33
+-83.0861532859323,42.388872358041,27,HRD12363,Cathedral Arts Apartments 4pct,10201 Woodward Ave,MHT Housing,New Construction,27,27
+-83.0269090060283,42.3509881328799,34,HRD10142,Mcdonald Square,2900 E Vernor Hwy,MHT Housing,Occupied Rehabilitation,180,180
+-83.0993905335578,42.3138544830385,39,HRD10659,Porter-Junction Apts,1403 Junction St,DHC Three,Occupied Rehabilitation,10,9
+-82.9429014016802,42.3729743638963,43,HRD12010,Marlborough/JEI Residential,910 Marlborough St,"Jefferson East, Inc (JEI)",Vacant Rehabilitation,23,12
+-83.081843689696,42.3821682968854,44,HRD12268,Reverend Dr. Jim Holley Residences - 9pct,9001 Woodward Ave,"MHT Housing, Historic Little Rock Baptist Church",Vacant Rehabilitation,30,30
+-83.0880852048605,42.3712667625496,45,HRD12297,Merrill Place II,1312 Seward St,S&S Development Group,New Construction,27,14
+-83.0688219146554,42.365398730464,47,HRD12343,60 Harper,60 Harper Ave,MHT Housing,New Construction,49,49
+-83.0850921334995,42.3799011935654,48,HRD11708,Lee Arden,660 Hazelwood St,Inkwell Partners,Vacant Rehabilitation,47,47
+-83.0486020534155,42.3544685865645,53,HRD10084,Friendship Meadows I & III,1001 Leland St,Communities Of Hope Inc,Occupied Rehabilitation,153,153
+-83.1698543274516,42.419513638407,64,HRD12442,Dr Violet T Lewis Village - 4pct,17370 Meyers Rd,"Wallick Communities, PVM",New Construction,73,73
+-83.0491094942982,42.3552289705693,72,HRD10085,Friendship Meadows II,1003 Leland St,Communities Of Hope Inc,Occupied Rehabilitation,53,53
+-83.08913695765,42.3222519223016,75,HRD10106,Hubbard Farms Apartments,465 W Grand Blvd,MiSide (fka Southwest Solutions),Vacant Rehabilitation,60,60
+-83.1182676321216,42.3760796113464,77,HRD10264,West Boston Apartments,3220 W Boston Blvd,Develop Detroit Inc,Occupied Rehabilitation,27,27
+-83.0926305,42.321861,85,HRD12440,La Joya Gardens - 9pct,4022 W Vernor Hwy,Cinnaire /SDBA/Invest Detroit,New Construction,25,20
+-83.1327086412004,42.3094785148847,87,HRD10226,Springwells Properties,2316 Lawndale St,MHT Housing,Occupied Rehabilitation,89,79
+-83.076301849695,42.3437105909775,89,HRD12247,Osi Art Apartments,3820 Grand River Ave,URGE Development Group,New Construction,30,30
+-83.0678523943362,42.3735405104069,94,HRD12322,The Beauton,503 Horton St,CADS III Management,New Construction,29,15
+-82.9842998226894,42.4290704997641,106,HRD12082,Mapleridge / Osborn Housing Initiative,13623 Mapleridge St,Osborn Neighborhood Alliance,Vacant Rehabilitation,6,6
+-83.0752469345283,42.3754297842771,111,HRD12359,Marwood + Marston: New Construction,111 Marston,Develop Detroit Inc,New Construction,12,12
+-83.0584309870701,42.3397674298831,112,HRD12249,The Anchor at Mariner's Inn - 4pct,445 Ledyard St,Cinnaire,New Construction,14,14
+-83.0989591941491,42.3850068315647,122,HRD10685,The Shirley,1442 Calvert St,City Of Detroit,Vacant Rehabilitation,22,22
+-83.0776977701521,42.3430556461719,130,HRD10209,Roberts III Apartments,3901 Grand River Ave,Sam Thomas / MHT,Occupied Rehabilitation,197,197
+-82.9352690966995,42.4037500760788,131,HRD12356,The Ribbon (Charter One Bank),16530 E Warren Ave,"Flux City, LLC",New Construction,18,18
+-83.0763249882912,42.3260694087419,151,HRD12112,The Brooke on Bagley,2420 Bagley St,Woodborn Partners,New Construction,78,16
+-83.0439376707544,42.4145600274128,155,HRD12085,Transfiguration School,5829 Rupert St,Ethos / Cinnaire,Adaptive Reuse,19,19
+-83.11466219191,42.3314677244323,157,HRD12329,Campbell Street Apartments (5800 Michigan Ave),5800 Michigan Ave,MiSide (fka Southwest Solutions),New Construction,40,40
+-83.0609410819068,42.3546367975466,160,HRD12100,The Freelon at Sugar Hill,81 Garfield St,Develop Detroit + POAH,New Construction,68,14
+-83.0714778064699,42.3351773115808,165,HRD12269,Left Field I,2610 Cochrane St,American Community Developers,New Construction,60,48
+-82.949646671475,42.3778163221478,169,HRD10128,Lakewood Manor,14200 Kercheval St,U-SNAP-BAC / MHT,Occupied Rehabilitation,30,30
+-83.0199447485793,42.4423831938757,171,HRD12079,Benjamin O Davis Veteran's Village,4777 E Outer Dr,"Davis Veterans Village, LLP - AMAC Development, Anchor Team, Beal Group, CCIH/COH",New Construction,50,50
+-83.0828305484437,42.4415013083056,177,HRD10155,Morton Manor,20000 Dequindre St,Gabriel Management Group LLC,Occupied Rehabilitation,151,150
+-83.1389493154694,42.3071926581132,181,HRD10064,Pablo Davis,9200 W Vernor Hwy,Bridging Communities / MHT,Occupied Rehabilitation,80,80
+-82.996408497079,42.3503656530838,199,HRD12195,7850 E Jefferson II - 9 pct,7852 E Jefferson Ave,Ginosko Development,New Construction,44,44
+-83.0884005141073,42.3878595976557,208,HRD12298,The Charlotte,10210 2nd Blvd,,Vacant Rehabilitation,28,28
+-83.060692905257,42.3478677178662,216,HRD10033,Orchestra Place,100 Parsons St,Larc Group,Occupied Rehabilitation,82,82
+-83.0623357059974,42.3560279466984,219,HRD10544,Cathedral Tower,80 E Hancock St,MRK Partners,Occupied Rehabilitation,236,236
+-83.2570788846523,42.4181943089273,223,HRD12325,Orchard Village Apartments,21722 Orchard St,CHN & Detroit Blight Busters,New Construction,48,48
+-83.0780001671179,42.3741325817432,233,HRD10149,Midtown Square Apartments,93 Seward St,"John Stanley, Inc & Develop Detroit",Occupied Rehabilitation,73,72
+-83.0845739751609,42.3795459506674,237,HRD11700,The Hazelwood (Weber Apartments),655 Hazelwood St,Inkwell Partners,Vacant Rehabilitation,44,41
+-83.0845652521244,42.3173491066839,240,HRD10217,Savannah-Wilshire,250 W Grand Blvd,MiSide (fka Southwest Solutions),Occupied Rehabilitation,40,40
+-82.9998726790103,42.3585124747936,244,HRD12063,Parker Durand,8003 Kercheval St,"The Roxbury Group, Invest Detroit",New Construction,92,46
+-83.0132468787326,42.3793783028862,247,HRD10246,Van Dyke Center,8100 Gratiot Ave,MHT Housing,Occupied Rehabilitation,200,200
+-83.0848159264958,42.3799990562475,248,HRD11691,Kingsley Arms Apartments,646 Hazelwood St,Inkwell Partners,New Construction,40,40
+-83.1698543274516,42.419513638407,250,HRD12273,Dr. Violet T Lewis Village - 9pct,17370 Meyers Rd,"Wallick Communities, PVM",Adaptive Reuse,35,32
+-82.949752051277,42.3655043811804,259,HRD10120,Jefferson Square,541 Dickerson St,MHT Housing,Occupied Rehabilitation,180,180
+-82.9471149253315,42.3859137923534,260,HRD12073,Xavier Square,3115 Alter Rd,Nova Development,New Construction,14,14
+-83.1530493556747,42.3671013318375,264,HRD10162,Northlawn Apartments,9545 Northlawn St,Larc Group,Occupied Rehabilitation,96,95
+-83.0526151823498,42.3354486760176,269,HRD12144,The Residences at 150 Bagley,150 Bagley St,Bagley Development Group,Vacant Rehabilitation,148,30
+-83.0800093152041,42.3580955593704,275,HRD10241,Trumbull Crossing,5500 Trumbull St,Cinnaire / Robert Kabbe,Occupied Rehabilitation,245,245
+-83.0653776003137,42.3462354628152,278,HRD10018,Brainard Street Apartments,680 Brainard St,Cass Corridor Neighborhood Development Corporation,Occupied Rehabilitation,120,119
+-83.0693117048873,42.3700635590535,301,HRD12186,Milwaukee Junction,258 E Milwaukee St,Detroit Catholic Pastoral Alliance (DCPA),Adaptive Reuse,25,20
+-83.2332375836961,42.4054362731099,303,HRD12302,Grandmont Rosedale Collective II: West Outer Drive Apartments,9710 W Outer Dr,Grandmont Rosedale Development Corporation,Vacant Rehabilitation,35,35
+-83.0837268214852,42.3824102144649,309,HRD10336,Clairmount Apartments - The Claire,100 Clairmount St,Century Partners,Vacant Rehabilitation,40,40
+-83.0640218888503,42.3646286758186,314,HRD11356,Belnord Apartments,324 Hendrie St,Jacobs Street LLC,Occupied Rehabilitation,29,29
+-82.9488292097157,42.4446050243942,318,HRD12310,Mohican Regent/ Lifebuilders III,16516 Fairmount Dr,Life Builders,Vacant Rehabilitation,5,5
+-83.0861532859323,42.388872358041,323,HRD12364,Cathedral Arts Apartments 9pct,10201 Woodward Ave,MHT Housing,New Construction,26,26
+-82.9492559783448,42.3681557654219,325,HRD10119,Jefferson Meadows,13101 Freud St,MHT Housing,Occupied Rehabilitation,83,83
+-82.9467659886844,42.3879931677293,328,HRD10154,Morningside Commons Multi,3530 Wayburn St,U-SNAP-BAC / MHT,Occupied Rehabilitation,64,64
+-83.2478803573146,42.4118145048132,346,HRD12275,Dr Maya Angelou Village,16711 Burt Rd,Full Circle Communities (services provided by Alternatives for Girls),New Construction,45,45
+-83.0584309870701,42.3397674298831,349,HRD12441,The Anchor at Mariner's Inn - 9pct,445 Ledyard St,Cinnaire,New Construction,30,30
+-83.0506221043173,42.3465931730104,360,HRD12250,Brush & Watson: Beaubien,454 Watson St,American Community Developers,New Construction,60,48
+-82.9661822402066,42.4461026582286,361,HRD12264,Mohican Regent/ Lifebuilders II,15044 Bringard Dr,Life Builders,Vacant Rehabilitation,3,3
+-82.9964356394211,42.350348120949,363,HRD12194,7850 E Jefferson I - 4pct,7850 E Jefferson Ave,Ginosko Development,New Construction,31,31
+-83.0252678698034,42.3596893382745,376,HRD12023,Sanctuary/Clay Apartments,3426 Mack Ave,Neighborhood Service Organization (NSO) / MHT,New Construction,42,42
+-83.0926305,42.321861,379,HRD12064,La Joya Gardens 4pct,4022 W Vernor Hwy,Cinnaire /SDBA/Invest Detroit,New Construction,28,22
+-83.0063219770564,42.3584917568338,393,HRD12204,IVGV Duplex R&R Phase I,2251 Sheridan St,Develop Detroit Inc,Vacant Rehabilitation,12,6
+-83.1986141974464,42.4312851523422,394,HRD10017,Bowin Place,15400 W Seven Mile Rd,Jonathan Rose Companies,Occupied Rehabilitation,193,193
+-83.1443335396616,42.41694295912,402,HRD12292,Sawyer Art Apartments,7303 W Mcnichols Rd,"Urge Development, N'Namdi Holdings, Hosey Development",New Construction,38,38
+-82.9994517367894,42.357127484767,412,HRD10950,Van Dyke Village Apartments,1775 Van Dyke St,Kipling Development & Woodborn Partners,Occupied Rehabilitation,16,8
+-83.0272671986912,42.3438277389423,414,HRD10176,Parkview Place,1401 Chene St,MHT Housing,Occupied Rehabilitation,199,197
+-83.0762596819398,42.3496139476564,419,HRD10244,University Meadows,4500 Trumbull St,Develop Detroit/ PVM,Occupied Rehabilitation,53,53
+-83.0830462719496,42.3821521377188,424,HRD12056,Ruth Ellis Clairmount (REC) Center,61 Clairmount St,Full Circle Communities,New Construction,43,42
