@@ -6,345 +6,202 @@ import {
   MoveLogEntry,
   SimulationState,
 } from "@/types/housing";
+import { CSV_HOUSES } from "@/data/housingData";
 
-const GROUP_SIZE = 5;
-const GROUP_COUNT = 10;
+// ─── Units from CSV ────────────────────────────────────────────────────────────
 
-const neighborhoods = [
-  "Harbor",
-  "Market",
-  "Heights",
-  "Cedar",
-  "River",
-  "Garden",
-  "Harbor",
-  "Market",
-  "Heights",
-  "Garden",
+const units: HousingUnit[] = CSV_HOUSES.map((h, i) => ({
+  id: `u${i + 1}`,
+  label: h.siteName.length > 22 ? h.siteName.slice(0, 22) + "…" : h.siteName,
+  neighborhood: h.neighborhood,
+  x: h.x,
+  y: h.y,
+  bedrooms: h.bedrooms,
+  capacity: Math.min(h.bedrooms + 1, 6),
+  accessible: h.wheelchairAccess,
+  currentOccupantId: `o${i + 1}`,
+  originalOccupantId: `o${i + 1}`,
+  // Extended CSV fields
+  siteId: h.id,
+  siteName: h.siteName,
+  address: h.address,
+  ownerDeveloper: h.ownerDeveloper,
+  constructionType: h.constructionType,
+  bathrooms: h.bathrooms,
+  squareFootage: h.squareFootage,
+  distanceToTransit: h.distanceToTransit,
+  distanceToDowntown: h.distanceToDowntown,
+  safety: h.safety,
+  noise: h.noise,
+  cleanliness: h.cleanliness,
+  vibe: h.vibe,
+  monthlyRent: h.monthlyRent,
+  utilities: h.utilities,
+  maintenanceBurden: h.maintenanceBurden,
+  houseCondition: h.houseCondition,
+  appliances: h.appliances,
+  repairsNeeded: h.repairsNeeded,
+  stairs: h.stairs,
+  wheelchairAccess: h.wheelchairAccess,
+  elderlyFriendlyLayout: h.elderlyFriendlyLayout,
+  schoolQuality: h.schoolQuality,
+  schoolZone: h.schoolZone,
+  busAccess: h.busAccess,
+  parking: h.parking,
+  laundry: h.laundry,
+  ac: h.ac,
+  yard: h.yard,
+  storage: h.storage,
+  internetQuality: h.internetQuality,
+  unitType: h.unitType,
+  backyard: h.backyard,
+  balcony: h.balcony,
+  nearbyPark: h.nearbyPark,
+  petFriendly: h.petFriendly,
+  leaseSecurity: h.leaseSecurity,
+  lon: h.lon,
+  lat: h.lat,
+}));
+
+const allUnitIds = units.map((u) => u.id);
+
+// ─── Original residents (one per unit) ────────────────────────────────────────
+
+const originalLastNames = [
+  "Reyes","Patel","Lopez","Hughes","Baker","Adams","Nguyen","Carter","Wright","Brown",
+  "Young","Turner","Parker","Watson","Flores","Mitchell","Kelly","Sanders","Powell","Long",
+  "Perry","Coleman","Russell","Jenkins","Bryant","Barnes","Cole","Gray","Rivera","Cooper",
+  "Morgan","Bailey","Richardson","Cox","Ward","Torres","Peterson","Ramirez","James","Watkins",
+  "Brooks","Wood","Bennett","Price","Sandoval","Bell","Baez","Cook","Gomez","Howard",
+  "Reed","Khan","Dean","Hayes","Wells","Kim","Vega","Lopez","Ray","Sims","Hunt",
+  "Owens","Fox","Stone","Pierce","Diaz","Grant","Ross","Shaw","Morris","Bautista",
+  "Lane","Hale","Nash","Park","Holmes","Fisher",
 ];
 
-const groupAnchors = [
-  { x: 140, y: 130 },
-  { x: 650, y: 128 },
-  { x: 1160, y: 130 },
-  { x: 146, y: 588 },
-  { x: 656, y: 592 },
-  { x: 1166, y: 592 },
-  { x: 284, y: 252 },
-  { x: 798, y: 250 },
-  { x: 1296, y: 252 },
-  { x: 1288, y: 714 },
-];
-
-const unitOffsets = [
-  { x: 0, y: 0 },
-  { x: 118, y: 10 },
-  { x: 238, y: 0 },
-  { x: 54, y: 124 },
-  { x: 194, y: 134 },
-];
-
-const queueFirstNames = [
-  "Maya",
-  "Jordan",
-  "Sofia",
-  "Amira",
-  "Leo",
-  "Nia",
-  "Omar",
-  "Elena",
-  "Rosa",
-  "Marcus",
-  "Ivy",
-  "Noah",
-  "Ava",
-  "Theo",
-  "Layla",
-  "Evan",
-  "Mina",
-  "Julian",
-  "Talia",
-  "Andre",
-  "Zara",
-  "Malik",
-  "Clara",
-  "Isaac",
-  "Nora",
-  "Cam",
-  "Priya",
-  "Dante",
-  "Lina",
-  "Miles",
-  "Aya",
-  "Rowan",
-  "Keisha",
-  "Daniel",
-  "Farah",
-  "Eli",
-  "Nadine",
-  "Victor",
-  "Selah",
-  "Bennett",
-  "Ari",
-  "Hana",
-  "Mateo",
-  "Skye",
-  "Zion",
-  "Maren",
-  "Jonah",
-  "Kira",
-  "Remy",
-  "June",
-];
-
-const queueLastNames = [
-  "Chen",
-  "Ali",
-  "King",
-  "Green",
-  "Santos",
-  "Brooks",
-  "Price",
-  "Moore",
-  "Bell",
-  "Dale",
-  "Scott",
-  "Foster",
-  "Lewis",
-  "Ward",
-  "James",
-  "Stone",
-  "Pierce",
-  "Diaz",
-  "Cole",
-  "Grant",
-  "Ross",
-  "Shaw",
-  "Perry",
-  "Bennett",
-  "West",
-  "Morris",
-  "Bautista",
-  "Lane",
-  "Hale",
-  "Nash",
-  "Park",
-  "Holmes",
-  "Fisher",
-  "Reed",
-  "Khan",
-  "Long",
-  "Cruz",
-  "Dean",
-  "Hayes",
-  "Wells",
-  "Kim",
-  "Vega",
-  "Lopez",
-  "Ray",
-  "Cook",
-  "Bailey",
-  "Sims",
-  "Hunt",
-  "Owens",
-  "Fox",
-];
-
-const originalNames = [
-  "Reyes",
-  "Patel",
-  "Lopez",
-  "Hughes",
-  "Baker",
-  "Adams",
-  "Nguyen",
-  "Carter",
-  "Wright",
-  "Brown",
-  "Young",
-  "Turner",
-  "Parker",
-  "Watson",
-  "Flores",
-  "Mitchell",
-  "Kelly",
-  "Sanders",
-  "Powell",
-  "Long",
-  "Perry",
-  "Coleman",
-  "Russell",
-  "Jenkins",
-  "Bryant",
-  "Barnes",
-  "Cole",
-  "Gray",
-  "Rivera",
-  "Cooper",
-  "Morgan",
-  "Bailey",
-  "Richardson",
-  "Cox",
-  "Ward",
-  "Torres",
-  "Peterson",
-  "Ramirez",
-  "James",
-  "Watkins",
-  "Brooks",
-  "Wood",
-  "Bennett",
-  "Price",
-  "Sandoval",
-  "Bell",
-  "Baez",
-  "Cook",
-  "Gomez",
-  "Howard",
-];
-
-const queuePriorityGroups = [
-  "Family reunification",
-  "Overcrowded",
-  "Transfer",
-  "Accessible need",
-  "Large household",
-  "Senior caregiver",
-  "Youth transition",
-  "Medical proximity",
-  "Employment corridor",
-  "School stability",
-];
-
-const stableGroups = new Set([6, 7]);
-const partiallyLockedGroups = new Set([8, 9]);
-
-const allUnitIds = Array.from({ length: GROUP_COUNT * GROUP_SIZE }, (_, index) => `u${index + 1}`);
-const units: HousingUnit[] = Array.from({ length: GROUP_COUNT }, (_, groupIndex) => {
-  const anchor = groupAnchors[groupIndex];
-  const neighborhood = neighborhoods[groupIndex];
-  const groupAccessible = groupIndex % 2 === 0;
-  const bedroomPattern = [2, 3, 3, 4, 4];
-  const capacityPattern = [3, 4, 4, 5, 5];
-
-  return unitOffsets.map((offset, localIndex) => {
-    const absoluteIndex = groupIndex * GROUP_SIZE + localIndex + 1;
-    return {
-      id: `u${absoluteIndex}`,
-      label: `${neighborhood}-${String(absoluteIndex).padStart(2, "0")}`,
-      neighborhood,
-      x: anchor.x + offset.x,
-      y: anchor.y + offset.y,
-      bedrooms: bedroomPattern[localIndex],
-      capacity: capacityPattern[localIndex],
-      accessible: groupAccessible && localIndex < 2,
-      currentOccupantId: `o${absoluteIndex}`,
-      originalOccupantId: `o${absoluteIndex}`,
-    };
-  });
-}).flat();
-
-const originalHouseholds: Household[] = units.map((unit, index) => ({
-  id: `o${index + 1}`,
-  name: originalNames[index],
+const originalHouseholds: Household[] = units.map((unit, i) => ({
+  id: `o${i + 1}`,
+  name: originalLastNames[i % originalLastNames.length],
   source: "original",
   currentUnitId: unit.id,
   householdSize: Math.min(unit.capacity, unit.bedrooms),
-  accessibilityNeed: unit.accessible && index % 6 === 0,
+  accessibilityNeed: unit.accessible && i % 6 === 0,
   waitTimeMonths: 0,
   priorityGroup: "Existing resident",
   optedIn: false,
   preferences: [unit.id],
 }));
 
-function prioritizeTargets(
-  currentUnitId: string,
-  preferences: string[],
-  preferredUnitIds: string[],
-) {
-  const front = preferredUnitIds.filter((unitId) => unitId !== currentUnitId);
-  const rest = preferences.filter(
-    (unitId) => unitId !== currentUnitId && !front.includes(unitId),
-  );
+// ─── Queue households ─────────────────────────────────────────────────────────
 
-  return [...front, currentUnitId, ...rest];
+const queueFirstNames = [
+  "Maya","Jordan","Sofia","Amira","Leo","Nia","Omar","Elena","Rosa","Marcus",
+  "Ivy","Noah","Ava","Theo","Layla","Evan","Mina","Julian","Talia","Andre",
+  "Zara","Malik","Clara","Isaac","Nora","Cam","Priya","Dante","Lina","Miles",
+  "Aya","Rowan","Keisha","Daniel","Farah","Eli","Nadine","Victor","Selah","Bennett",
+  "Ari","Hana","Mateo","Skye","Zion","Maren","Jonah","Kira","Remy","June",
+  "Cora","Felix","Imani","Tobias","Yara","Silas","Dara","Ezra","Linh","Caden",
+  "Amara","Declan","Riya","Finn","Lena","Asher","Zola","Hugo","Nadia","Elias",
+  "Tara","Cyrus","Malia","Bram","Sera","Anton","Wren","Idris","Pita","Vera",
+  "Kai","Freya","Jabari","Lyra","Soren","Adaeze","Remi","Juno","Kofi","Astrid",
+  "Nile","Bea","Olu","Clem","Sasha","Drew","Yemi","Lior","Ora","Tariq",
+  "Sela","Ines","Ciro","Mira","Thad","Yuki","Amir","Lexi","Zev","Emeka",
+  "Nyah","Ren","Chloe","Sai","Bex","Amos","Faye","Osei","Luz","Kwame",
+];
+
+const queueLastNames = [
+  "Chen","Ali","King","Green","Santos","Brooks","Price","Moore","Bell","Dale",
+  "Scott","Foster","Lewis","Ward","James","Stone","Pierce","Diaz","Cole","Grant",
+  "Ross","Shaw","Perry","Bennett","West","Morris","Bautista","Lane","Hale","Nash",
+  "Park","Holmes","Fisher","Reed","Khan","Long","Cruz","Dean","Hayes","Wells",
+  "Kim","Vega","Lopez","Ray","Cook","Bailey","Sims","Hunt","Owens","Fox",
+  "Nguyen","Patel","Rivera","Washington","Thompson","Martinez","Robinson","Clark","Rodriguez","Harris",
+  "Jackson","White","Taylor","Anderson","Thomas","Wilson","Martin","Garcia","Lee","Perez",
+  "Johnson","Jones","Miller","Davis","Brown","Young","Turner","Hall","Adams","Nelson",
+  "Carter","Mitchell","Perez","Roberts","Turner","Phillips","Campbell","Parker","Edwards","Collins",
+  "Stewart","Sanchez","Morris","Rogers","Reed","Cook","Morgan","Bell","Murphy","Bailey",
+  "Cooper","Richardson","Cox","Howard","Ward","Torres","Peterson","Gray","Ramirez","James",
+  "Watson","Brooks","Kelly","Sanders","Powell","Wood","Bennett","Price","Gomez","Russell",
+];
+
+const priorityGroups = [
+  "Family reunification","Overcrowded","Transfer","Accessible need","Large household",
+  "Senior caregiver","Youth transition","Medical proximity","Employment corridor","School stability",
+];
+
+const QUEUE_COUNT = 114; // ~1.5× the 76 units
+
+// Group units by neighborhood for preference generation
+const unitsByNeighborhood: Record<string, string[]> = {};
+for (const unit of units) {
+  if (!unitsByNeighborhood[unit.neighborhood]) {
+    unitsByNeighborhood[unit.neighborhood] = [];
+  }
+  unitsByNeighborhood[unit.neighborhood].push(unit.id);
 }
 
-const queueHouseholds: Household[] = Array.from({ length: GROUP_COUNT }, (_, groupIndex) => {
-  const groupUnitIds = allUnitIds.slice(groupIndex * GROUP_SIZE, groupIndex * GROUP_SIZE + GROUP_SIZE);
-  const localWaitBoost = groupIndex < 6 ? 24 : groupIndex < 8 ? 16 : 20;
-  const isStableGroup = stableGroups.has(groupIndex);
-  const isPartiallyLockedGroup = partiallyLockedGroups.has(groupIndex);
-  const neighborhoodPeers = allUnitIds.filter(
-    (unitId, index) => neighborhoods[Math.floor(index / GROUP_SIZE)] === neighborhoods[groupIndex],
-  );
+const neighborhoods = Object.keys(unitsByNeighborhood);
 
-  return Array.from({ length: GROUP_SIZE }, (_, localIndex) => {
-    const absoluteIndex = groupIndex * GROUP_SIZE + localIndex + 1;
-    const unitId = groupUnitIds[localIndex];
-    const betterTargetId = groupUnitIds[(localIndex + 1) % GROUP_SIZE];
-    const secondBetterTargetId = groupUnitIds[(localIndex + 2) % GROUP_SIZE];
-    const accessibleNeed = groupIndex % 2 === 0 && localIndex === 0;
-    const householdSize = isStableGroup
-      ? [1, 2, 3, 4, 5][localIndex]
-      : [2, 2, 3, 3, 2][localIndex];
-    const optedIn = !(isPartiallyLockedGroup && localIndex === 2);
-
-    const orderedCore = isStableGroup
-      ? [unitId, betterTargetId, secondBetterTargetId]
-      : [betterTargetId, unitId, secondBetterTargetId];
-    const tail = allUnitIds.filter(
-      (candidate) => !orderedCore.includes(candidate),
-    );
-    const neighborhoodTail = [
-      ...neighborhoodPeers.filter((candidate) => !orderedCore.includes(candidate)),
-      ...tail.filter((candidate) => !neighborhoodPeers.includes(candidate)),
-    ];
-
-    return {
-      id: `q${absoluteIndex}`,
-      name: `${queueFirstNames[absoluteIndex - 1]} ${queueLastNames[absoluteIndex - 1]}`,
-      source: "fifo_queue" as const,
-      currentUnitId: null,
-      householdSize,
-      accessibilityNeed: accessibleNeed,
-      waitTimeMonths: localWaitBoost + (GROUP_SIZE - localIndex) * 2,
-      priorityGroup: queuePriorityGroups[(groupIndex + localIndex) % queuePriorityGroups.length],
-      optedIn,
-      preferences: [...orderedCore, ...neighborhoodTail],
-    };
-  });
-}).flat();
-
-const crossNeighborhoodPreferenceOverrides: Record<string, string[]> = {
-  q1: ["u11"],
-  q11: ["u21"],
-  q21: ["u1"],
-  q3: ["u8"],
-  q8: ["u13"],
-  q13: ["u18"],
-  q18: ["u23"],
-  q23: ["u3"],
-  q4: ["u29"],
-  q29: ["u44"],
-  q44: ["u4"],
-};
-
-const seededQueueHouseholds: Household[] = queueHouseholds.map((household) => {
-  const preferredTargets = crossNeighborhoodPreferenceOverrides[household.id];
-  if (!preferredTargets) {
-    return household;
+function shuffleSeeded(arr: string[], seed: number): string[] {
+  const copy = [...arr];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = ((seed * 1103515245 + 12345) & 0x7fffffff) % (i + 1);
+    seed = j;
+    [copy[i], copy[j]] = [copy[j], copy[i]];
   }
+  return copy;
+}
+
+const queueHouseholds: Household[] = Array.from({ length: QUEUE_COUNT }, (_, i) => {
+  const neighborhoodIndex = i % neighborhoods.length;
+  const preferredNeighborhood = neighborhoods[neighborhoodIndex];
+  const neighborhoodUnits = unitsByNeighborhood[preferredNeighborhood] ?? [];
+  const otherUnits = allUnitIds.filter((id) => !neighborhoodUnits.includes(id));
+
+  // First prefer neighborhood units, then others (with seeded shuffle for variety)
+  const shuffledNeighborhood = shuffleSeeded(neighborhoodUnits, i * 17 + 3);
+  const shuffledOther = shuffleSeeded(otherUnits, i * 31 + 7);
+  const preferences = [...shuffledNeighborhood, ...shuffledOther];
+
+  const accessibilityNeed = i % 8 === 0;
+  const householdSize = [1, 2, 2, 3, 3, 4, 2, 3, 1, 4][i % 10];
+  const optedIn = true; // everyone opts into TTC by default; can be changed per-person
 
   return {
-    ...household,
-    preferences: prioritizeTargets(
-      household.id.replace("q", "u"),
-      household.preferences,
-      preferredTargets,
-    ),
+    id: `q${i + 1}`,
+    name: `${queueFirstNames[i]} ${queueLastNames[i]}`,
+    source: "fifo_queue" as const,
+    currentUnitId: null,
+    householdSize,
+    accessibilityNeed,
+    waitTimeMonths: 36 - (i % 30),
+    priorityGroup: priorityGroups[i % priorityGroups.length],
+    optedIn,
+    preferences,
   };
 });
+
+// Add a handful of cross-neighborhood preference overrides to seed TTC cycles
+const overrides: Record<string, string[]> = {
+  q1: ["u11", "u3"],
+  q11: ["u21", "u1"],
+  q21: ["u1", "u11"],
+  q3: ["u8", "u13"],
+  q8: ["u13", "u3"],
+  q13: ["u3", "u8"],
+  q5: ["u30", "u47"],
+  q30: ["u47", "u5"],
+  q47: ["u5", "u30"],
+};
+
+const seededQueueHouseholds: Household[] = queueHouseholds.map((hh) => {
+  const preferred = overrides[hh.id];
+  if (!preferred) return hh;
+  const front = preferred.filter((id) => id !== hh.preferences[0]);
+  const rest = hh.preferences.filter((id) => !front.includes(id));
+  return { ...hh, preferences: [...front, ...rest] };
+});
+
+// ─── House priority profiles ───────────────────────────────────────────────────
 
 const priorityRulePatterns: HousePriorityCriterion[][] = [
   ["accessible_need", "longest_wait", "best_fit", "priority_group"],
@@ -354,39 +211,35 @@ const priorityRulePatterns: HousePriorityCriterion[][] = [
   ["largest_household", "priority_group", "longest_wait", "best_fit"],
 ];
 
-const houseProfiles: HousePriorityProfile[] = units.map((unit, absoluteUnitIndex) => {
-  const localIndex = absoluteUnitIndex % GROUP_SIZE;
-  const neighborhoodIndex = neighborhoods.indexOf(unit.neighborhood);
-  const basePattern = priorityRulePatterns[(neighborhoodIndex + localIndex) % priorityRulePatterns.length];
-
+const houseProfiles: HousePriorityProfile[] = units.map((unit, i) => {
+  const basePattern = priorityRulePatterns[i % priorityRulePatterns.length];
   let priorityRules = [...basePattern];
 
   if (unit.accessible) {
     priorityRules = [
       "accessible_need",
-      ...priorityRules.filter((criterion) => criterion !== "accessible_need"),
+      ...priorityRules.filter((c) => c !== "accessible_need"),
     ];
   }
 
   if (unit.capacity >= 5) {
     priorityRules = [
       "largest_household",
-      ...priorityRules.filter((criterion) => criterion !== "largest_household"),
+      ...priorityRules.filter((c) => c !== "largest_household"),
     ];
   }
 
-  if (unit.capacity <= 3) {
+  if (unit.capacity <= 2) {
     priorityRules = [
       "best_fit",
-      ...priorityRules.filter((criterion) => criterion !== "best_fit"),
+      ...priorityRules.filter((c) => c !== "best_fit"),
     ];
   }
 
-  return {
-    unitId: unit.id,
-    priorityRules,
-  };
+  return { unitId: unit.id, priorityRules };
 });
+
+// ─── Move log ─────────────────────────────────────────────────────────────────
 
 const moveLog: MoveLogEntry[] = [
   {
@@ -394,16 +247,18 @@ const moveLog: MoveLogEntry[] = [
     phase: "setup",
     title: "Scenario seeded",
     detail:
-      "All 50 units begin occupied by original households. Fifty queue households wait in FIFO order, and the city is intentionally grouped so TTC can expose several clear multi-household exchange cycles after FIFO finishes.",
+      "All 76 Detroit affordable housing sites are loaded from the City's $1B construction dataset. Each unit is occupied by a seed resident; 50 queue households wait in FIFO order.",
   },
 ];
+
+// ─── Export ───────────────────────────────────────────────────────────────────
 
 export function createSeedState(): SimulationState {
   return {
     households: [...originalHouseholds, ...seededQueueHouseholds],
     units,
     houseProfiles,
-    fifoQueue: seededQueueHouseholds.map((household) => household.id),
+    fifoQueue: seededQueueHouseholds.map((hh) => hh.id),
     moveLog,
     fifoComplete: false,
     ttcComplete: false,

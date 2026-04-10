@@ -64,7 +64,6 @@ export default function HomePage() {
   const [isPaused, setIsPaused] = useState(false);
   const [comparisonMode, setComparisonMode] = useState(false);
   const [selectedHouseholdId, setSelectedHouseholdId] = useState<string | null>("q1");
-  const [editingHouseholdId, setEditingHouseholdId] = useState<string | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const [floatingMoves, setFloatingMoves] = useState<FloatingMove[]>([]);
   const [activeQueueAssignmentId, setActiveQueueAssignmentId] = useState<string | null>(null);
@@ -142,15 +141,22 @@ export default function HomePage() {
     return token === runTokenRef.current;
   }
 
+  function clearOptInOverrides(households: typeof state.households) {
+    if (typeof window === "undefined") return;
+    for (const h of households) {
+      localStorage.removeItem(`ttc:optedIn:${h.id}`);
+    }
+  }
+
   function resetScenario() {
     runTokenRef.current += 1;
+    clearOptInOverrides(stateRef.current.households);
     const nextState = createInitialState();
     setPhase("setup");
     setSpeed(1);
     setIsPaused(false);
     setComparisonMode(false);
     setSelectedHouseholdId("q1");
-    setEditingHouseholdId(null);
     setSelectedUnitId(null);
     setFloatingMoves([]);
     setActiveQueueAssignmentId(null);
@@ -162,26 +168,8 @@ export default function HomePage() {
     commit(nextState);
   }
 
-  function handleSelectUnit(unitId: string) {
-    setSelectedUnitId(unitId);
-    const unit = getUnitById(state.households.length ? state.units : [], unitId);
-    const occupant = getHouseholdById(state.households, unit?.currentOccupantId ?? null);
-    if (occupant?.source === "fifo_queue") {
-      setSelectedHouseholdId(occupant.id);
-    }
-  }
-
   function clearSelectedUnit() {
     setSelectedUnitId(null);
-  }
-
-  function openHouseholdEditor(householdId: string) {
-    setSelectedHouseholdId(householdId);
-    setEditingHouseholdId(householdId);
-  }
-
-  function closeHouseholdEditor() {
-    setEditingHouseholdId(null);
   }
 
   function advanceTtc() {
@@ -229,32 +217,14 @@ export default function HomePage() {
 
   function toggleHouseholdOptIn(householdId: string) {
     const household = state.households.find((entry) => entry.id === householdId);
-    if (!household || household.source !== "fifo_queue") {
-      return;
+    if (!household || household.source !== "fifo_queue") return;
+    const nextValue = !household.optedIn;
+    if (typeof window !== "undefined") {
+      localStorage.setItem(`ttc:optedIn:${householdId}`, String(nextValue));
     }
-
-    updateHousehold(householdId, { optedIn: !household.optedIn });
+    updateHousehold(householdId, { optedIn: nextValue });
   }
 
-  function swapPreference(householdId: string, rankIndex: number, unitId: string) {
-    if (!(phase === "setup" || phase === "post_fifo")) {
-      return;
-    }
-
-    commit({
-      ...state,
-      households: state.households.map((household) => {
-        if (household.id !== householdId || household.source !== "fifo_queue") {
-          return household;
-        }
-
-        return {
-          ...household,
-          preferences: swapArrayValue(household.preferences, rankIndex, unitId),
-        };
-      }),
-    });
-  }
 
   function updateUnit(
     unitId: string,
@@ -439,6 +409,23 @@ export default function HomePage() {
       },
     );
 
+    // Apply any opt-in preferences set from person pages before FIFO ran
+    if (typeof window !== "undefined") {
+      const overrides: Record<string, boolean> = {};
+      for (const h of working.households) {
+        const stored = localStorage.getItem(`ttc:optedIn:${h.id}`);
+        if (stored !== null) overrides[h.id] = stored === "true";
+      }
+      if (Object.keys(overrides).length > 0) {
+        working = {
+          ...working,
+          households: working.households.map((h) =>
+            overrides[h.id] !== undefined ? { ...h, optedIn: overrides[h.id] } : h,
+          ),
+        };
+      }
+    }
+
     commit(working);
     setFifoBaseline(deepClone(working));
     setPhase("post_fifo");
@@ -594,15 +581,9 @@ export default function HomePage() {
             households={state.households}
             units={state.units}
             fifoQueue={state.fifoQueue}
-            phase={phase}
             selectedHouseholdId={selectedHouseholdId}
-            editorHouseholdId={editingHouseholdId}
             activeQueueAssignmentId={activeQueueAssignmentId}
             recentlyAssignedHouseholdId={recentlyAssignedHouseholdId}
-            onOpenHouseholdEditor={openHouseholdEditor}
-            onCloseHouseholdEditor={closeHouseholdEditor}
-            onUpdateHousehold={updateHousehold}
-            onSwapPreference={swapPreference}
           />
 
           <MapCanvas
@@ -616,9 +597,7 @@ export default function HomePage() {
             ttcRound={ttcRound}
             ttcStage={ttcStage}
             floatingMoves={floatingMoves}
-            onSelectUnit={handleSelectUnit}
             onClearSelection={clearSelectedUnit}
-            onOpenHouseholdEditor={openHouseholdEditor}
             onToggleHouseholdOptIn={toggleHouseholdOptIn}
           />
 

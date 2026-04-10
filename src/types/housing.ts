@@ -20,6 +20,46 @@ export interface HousingUnit {
   accessible: boolean;
   currentOccupantId: string | null;
   originalOccupantId: string | null;
+  // Extended CSV fields
+  siteId: string;
+  siteName: string;
+  address: string;
+  ownerDeveloper: string;
+  constructionType: string;
+  bathrooms: number;
+  squareFootage: number;
+  distanceToTransit: number;
+  distanceToDowntown: number;
+  safety: number;
+  noise: number;
+  cleanliness: number;
+  vibe: number;
+  monthlyRent: number;
+  utilities: number;
+  maintenanceBurden: string;
+  houseCondition: number;
+  appliances: string;
+  repairsNeeded: string;
+  stairs: string;
+  wheelchairAccess: boolean;
+  elderlyFriendlyLayout: boolean;
+  schoolQuality: number;
+  schoolZone: string;
+  busAccess: string;
+  parking: number;
+  laundry: string;
+  ac: string;
+  yard: string;
+  storage: string;
+  internetQuality: string;
+  unitType: string;
+  backyard: string;
+  balcony: boolean;
+  nearbyPark: boolean;
+  petFriendly: boolean;
+  leaseSecurity: string;
+  lon: number;
+  lat: number;
 }
 
 export interface Household {

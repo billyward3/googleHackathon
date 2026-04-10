@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { clamp, cn } from "@/lib/utils";
 import { getHouseholdById, getPreferenceRank, getUnitById } from "@/lib/eligibility";
@@ -18,6 +19,9 @@ import {
   MOVE_OUT_POINT,
   QUEUE_DOCK_POINT,
   ROAD_SEGMENTS,
+  ROAD_PATHS,
+  ROAD_PATH_LABELS,
+  ROAD_SEGMENT_LABELS,
 } from "@/lib/map-layout";
 import {
   FloatingMove,
@@ -40,30 +44,11 @@ interface MapCanvasProps {
   ttcRound: TtcRound | null;
   ttcStage: "idle" | "preferences" | "spotlight" | "moving";
   floatingMoves: FloatingMove[];
-  onSelectUnit: (unitId: string) => void;
   onClearSelection: () => void;
-  onOpenHouseholdEditor: (householdId: string) => void;
   onToggleHouseholdOptIn: (householdId: string) => void;
 }
 
-const ROAD_PATHS = [
-  "M 56 170 C 212 178, 334 192, 492 210 C 670 228, 886 196, 1086 188 C 1256 182, 1408 194, 1584 228",
-  "M 58 330 C 212 344, 364 366, 534 364 C 710 362, 864 324, 1012 318 C 1200 308, 1370 332, 1568 360",
-  "M 56 520 C 228 532, 356 548, 530 546 C 734 542, 894 508, 1108 504 C 1278 500, 1422 516, 1570 548",
-  "M 64 756 C 248 742, 392 724, 576 730 C 780 738, 924 768, 1126 772 C 1294 776, 1442 754, 1574 734",
-];
-
-const STREET_SEGMENTS = [
-  { x1: 210, y1: 112, x2: 210, y2: 930 },
-  { x1: 392, y1: 112, x2: 392, y2: 930 },
-  { x1: 700, y1: 92, x2: 700, y2: 952 },
-  { x1: 876, y1: 92, x2: 876, y2: 952 },
-  { x1: 1232, y1: 94, x2: 1232, y2: 944 },
-  { x1: 1416, y1: 94, x2: 1416, y2: 944 },
-];
-
-const WATER_PATH =
-  "M 74 972 C 258 920, 414 952, 620 896 C 820 842, 942 886, 1114 834 C 1298 780, 1418 820, 1560 760";
+// Road data is now imported from @/lib/map-layout
 
 type ViewportState = {
   scale: number;
@@ -286,11 +271,10 @@ export function MapCanvas({
   ttcRound,
   ttcStage,
   floatingMoves,
-  onSelectUnit,
   onClearSelection,
-  onOpenHouseholdEditor,
   onToggleHouseholdOptIn,
 }: MapCanvasProps) {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const dragRef = useRef<{
     pointerId: number;
@@ -572,95 +556,54 @@ export function MapCanvas({
                 </g>
               ))}
 
+              {/* Straight road segments */}
               {ROAD_SEGMENTS.map((road) => (
-                <g key={road.id} filter="url(#road-shadow)">
-                  <line
-                    x1={road.x1}
-                    y1={road.y1}
-                    x2={road.x2}
-                    y2={road.y2}
-                    stroke="rgba(160, 171, 186, 0.34)"
-                    strokeWidth={road.width + 6}
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1={road.x1}
-                    y1={road.y1}
-                    x2={road.x2}
-                    y2={road.y2}
-                    stroke="rgba(255, 255, 255, 0.98)"
-                    strokeWidth={road.width}
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1={road.x1}
-                    y1={road.y1}
-                    x2={road.x2}
-                    y2={road.y2}
-                    stroke="rgba(207, 217, 229, 0.48)"
-                    strokeWidth="2"
-                    strokeDasharray="12 14"
-                    strokeLinecap="round"
-                  />
+                <g key={road.id}>
+                  {/* casing — gives the road a visible edge */}
+                  <line x1={road.x1} y1={road.y1} x2={road.x2} y2={road.y2}
+                    stroke="rgba(110,120,140,0.55)" strokeWidth={road.width + 10} strokeLinecap="round" />
+                  {/* road surface — slightly warm off-white so it reads against the background */}
+                  <line x1={road.x1} y1={road.y1} x2={road.x2} y2={road.y2}
+                    stroke="rgba(248,244,232,1)" strokeWidth={road.width} strokeLinecap="round" />
+                  {ROAD_SEGMENT_LABELS[road.id]?.text ? (
+                    <text x={ROAD_SEGMENT_LABELS[road.id].x} y={ROAD_SEGMENT_LABELS[road.id].y}
+                      fill="rgba(60,75,100,0.70)" fontSize="11" fontWeight="700" letterSpacing="0.14em">
+                      {ROAD_SEGMENT_LABELS[road.id].text}
+                    </text>
+                  ) : null}
                 </g>
               ))}
 
+              {/* Diagonal / curved arterials */}
               {ROAD_PATHS.map((path, index) => (
-                <g key={path} filter="url(#road-shadow)">
-                  <path d={path} fill="none" stroke="rgba(160, 171, 186, 0.28)" strokeWidth="22" strokeLinecap="round" />
-                  <path d={path} fill="none" stroke="rgba(255,255,255,0.98)" strokeWidth="16" strokeLinecap="round" />
-                  <path d={path} fill="none" stroke="rgba(207, 217, 229, 0.48)" strokeWidth="2" strokeDasharray="12 16" strokeLinecap="round" />
-                  <text
-                    x={122 + index * 330}
-                    y={index < 2 ? 150 + index * 170 : 660 + (index - 2) * 92}
-                    fill="rgba(79,97,120,0.62)"
-                    fontSize="12"
-                    fontWeight="600"
-                    letterSpacing="0.16em"
-                  >
-                    {["LAKESHORE AVE", "MARKET BLVD", "RIVERLINE RD", "GARDEN PKWY"][index]}
-                  </text>
+                <g key={index}>
+                  <path d={path} fill="none" stroke="rgba(110,120,140,0.50)" strokeWidth="24" strokeLinecap="round" />
+                  <path d={path} fill="none" stroke="rgba(248,244,232,1)" strokeWidth="14" strokeLinecap="round" />
+                  {ROAD_PATH_LABELS[index] ? (
+                    <text x={ROAD_PATH_LABELS[index].x} y={ROAD_PATH_LABELS[index].y}
+                      fill="rgba(60,75,100,0.70)" fontSize="11" fontWeight="700" letterSpacing="0.14em">
+                      {ROAD_PATH_LABELS[index].text}
+                    </text>
+                  ) : null}
                 </g>
               ))}
 
-              {STREET_SEGMENTS.map((street) => (
-                <g key={`${street.x1}-${street.y1}`}>
-                  <line
-                    x1={street.x1}
-                    y1={street.y1}
-                    x2={street.x2}
-                    y2={street.y2}
-                    stroke="rgba(255,255,255,0.72)"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                  />
-                  <line
-                    x1={street.x1}
-                    y1={street.y1}
-                    x2={street.x2}
-                    y2={street.y2}
-                    stroke="rgba(207, 217, 229, 0.46)"
-                    strokeWidth="1.5"
-                    strokeDasharray="8 14"
-                    strokeLinecap="round"
-                  />
-                </g>
-              ))}
-
+              {/* Detroit River — southern edge hint */}
               <path
-                d={WATER_PATH}
+                d="M 580 1010 C 740 980, 920 985, 1100 975 C 1280 965, 1420 978, 1560 990"
                 fill="none"
-                stroke="rgba(107, 163, 212, 0.42)"
-                strokeWidth="22"
+                stroke="rgba(107,163,212,0.38)"
+                strokeWidth="28"
                 strokeLinecap="round"
               />
               <path
-                d={WATER_PATH}
+                d="M 580 1010 C 740 980, 920 985, 1100 975 C 1280 965, 1420 978, 1560 990"
                 fill="none"
-                stroke="rgba(255,255,255,0.45)"
-                strokeWidth="4"
+                stroke="rgba(255,255,255,0.42)"
+                strokeWidth="6"
                 strokeLinecap="round"
               />
+              <text x="920" y="1050" fill="rgba(79,130,180,0.55)" fontSize="11" fontWeight="600" letterSpacing="0.18em">DETROIT RIVER</text>
 
               {preferenceEdges.map((edge, index) => {
                 const fromUnit = getUnitById(units, edge.fromUnitId);
@@ -803,13 +746,13 @@ export function MapCanvas({
                   key={unit.id}
                   layout
                   data-map-interactive="true"
-                  onClick={() => onSelectUnit(unit.id)}
+                  onClick={() => router.push(`/house?id=${unit.siteId}`)}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      onSelectUnit(unit.id);
+                      router.push(`/house?id=${unit.siteId}`);
                     }
                   }}
                   className={cn(
@@ -846,14 +789,11 @@ export function MapCanvas({
                       data-map-interactive="true"
                       onClick={(event) => {
                         event.stopPropagation();
-                        if (occupant.source === "fifo_queue") {
-                          onOpenHouseholdEditor(occupant.id);
-                        }
+                        router.push(`/person?id=${occupant.id}`);
                       }}
                       className={cn(
-                        "absolute -bottom-1 -right-1 flex h-6 min-w-6 items-center justify-center rounded-full border px-1 text-[10px] font-semibold shadow-sm",
+                        "absolute -bottom-1 -right-1 flex h-6 min-w-6 items-center justify-center rounded-full border px-1 text-[10px] font-semibold shadow-sm cursor-pointer",
                         occupantTone(occupant, result, phase),
-                        occupant.source === "fifo_queue" && "cursor-pointer",
                       )}
                     >
                       {occupant.name
