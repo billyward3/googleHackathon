@@ -13,6 +13,7 @@ import { MOVE_OUT_POINT, QUEUE_DOCK_POINT } from "@/lib/map-layout";
 import { buildSimulationMetrics } from "@/lib/metrics";
 import { buildTtcRound, applyTtcCycle, finalizeResults } from "@/lib/ttcEngine";
 import { deepClone } from "@/lib/utils";
+import { applyRankingsToState } from "@/lib/realtor/apply-rankings";
 import { HousePriorityCriterion } from "@/types/housing";
 import {
   FloatingMove,
@@ -58,7 +59,9 @@ function swapArrayValue<T>(values: T[], index: number, nextValue: T) {
 }
 
 export default function HomePage() {
-  const [state, setState] = useState<SimulationState>(createInitialState);
+  const [state, setState] = useState<SimulationState>(() =>
+    applyRankingsToState(createInitialState()),
+  );
   const [phase, setPhase] = useState<SimulationPhase>("setup");
   const [speed, setSpeed] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
@@ -151,7 +154,7 @@ export default function HomePage() {
   function resetScenario() {
     runTokenRef.current += 1;
     clearOptInOverrides(stateRef.current.households);
-    const nextState = createInitialState();
+    const nextState = applyRankingsToState(createInitialState());
     setPhase("setup");
     setSpeed(1);
     setIsPaused(false);
