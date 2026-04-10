@@ -23,8 +23,40 @@ import {
   SimulationState,
 } from "@/types/housing";
 
+const SESSION_KEY = "civic-housing-sim-state";
+const SESSION_PHASE_KEY = "civic-housing-sim-phase";
+const SESSION_FIFO_KEY = "civic-housing-sim-fifo-baseline";
+
 function createInitialState() {
   return deepClone(createSeedState());
+}
+
+function saveSimState(simState: SimulationState, phase: SimulationPhase, fifoBaseline: SimulationState | null) {
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(simState));
+    sessionStorage.setItem(SESSION_PHASE_KEY, JSON.stringify(phase));
+    if (fifoBaseline) {
+      sessionStorage.setItem(SESSION_FIFO_KEY, JSON.stringify(fifoBaseline));
+    }
+  } catch {
+    // storage full or unavailable
+  }
+}
+
+function loadSimState(): { state: SimulationState; phase: SimulationPhase; fifoBaseline: SimulationState | null } | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    const rawPhase = sessionStorage.getItem(SESSION_PHASE_KEY);
+    if (!raw || !rawPhase) return null;
+    const state = JSON.parse(raw) as SimulationState;
+    const phase = JSON.parse(rawPhase) as SimulationPhase;
+    const rawFifo = sessionStorage.getItem(SESSION_FIFO_KEY);
+    const fifoBaseline = rawFifo ? JSON.parse(rawFifo) as SimulationState : null;
+    return { state, phase, fifoBaseline };
+  } catch {
+    return null;
+  }
 }
 
 function sleep(ms: number) {
@@ -59,10 +91,11 @@ function swapArrayValue<T>(values: T[], index: number, nextValue: T) {
 }
 
 export default function HomePage() {
+  const [restored] = useState(() => loadSimState());
   const [state, setState] = useState<SimulationState>(() =>
-    applyRankingsToState(createInitialState()),
+    restored?.state ?? applyRankingsToState(createInitialState()),
   );
-  const [phase, setPhase] = useState<SimulationPhase>("setup");
+  const [phase, setPhase] = useState<SimulationPhase>(restored?.phase ?? "setup");
   const [speed, setSpeed] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [comparisonMode, setComparisonMode] = useState(false);
@@ -71,10 +104,15 @@ export default function HomePage() {
   const [floatingMoves, setFloatingMoves] = useState<FloatingMove[]>([]);
   const [activeQueueAssignmentId, setActiveQueueAssignmentId] = useState<string | null>(null);
   const [recentlyAssignedHouseholdId, setRecentlyAssignedHouseholdId] = useState<string | null>(null);
-  const [fifoBaseline, setFifoBaseline] = useState<SimulationState | null>(null);
+  const [fifoBaseline, setFifoBaseline] = useState<SimulationState | null>(restored?.fifoBaseline ?? null);
   const [ttcRound, setTtcRound] = useState<ReturnType<typeof buildTtcRound> | null>(null);
   const [ttcStage, setTtcStage] = useState<"idle" | "preferences" | "spotlight" | "moving">("idle");
   const [advanceTick, setAdvanceTick] = useState(0);
+
+  // Save state to sessionStorage so navigating to /person and back restores it
+  useEffect(() => {
+    saveSimState(state, phase, fifoBaseline);
+  }, [state, phase, fifoBaseline]);
 
   const stateRef = useRef(state);
   const pausedRef = useRef(isPaused);
