@@ -487,6 +487,71 @@ export default function HomePage() {
     setActiveQueueAssignmentId(null);
   }
 
+  function skipToTtc() {
+    if (phase !== "setup" && phase !== "fifo") return;
+    runTokenRef.current += 1;
+
+    let working = deepClone(stateRef.current);
+
+    working = appendLog(working, {
+      phase: "fifo",
+      title: "FIFO begins (skipped)",
+      detail: "FIFO allocation computed instantly.",
+    });
+
+    while (true) {
+      const step = getNextFifoStep(working);
+      if (!step) break;
+      const unit = getUnitById(working.units, step.unitId);
+      const original = getHouseholdById(working.households, step.originalOccupantId);
+      const assignee = getHouseholdById(working.households, step.assignedHouseholdId);
+      if (!unit || !original || !assignee || step.queueIndex === null) break;
+      working = {
+        ...working,
+        households: working.households.map((h) =>
+          h.id === original.id ? { ...h, currentUnitId: null } : h,
+        ),
+        units: working.units.map((u) =>
+          u.id === unit.id ? { ...u, currentOccupantId: null } : u,
+        ),
+      };
+      working = applyFifoStep(working, step);
+    }
+
+    working = { ...working, fifoComplete: true };
+    working = appendLog(working, {
+      phase: "fifo",
+      title: "FIFO complete",
+      detail: "All FIFO allocations applied.",
+    });
+
+    if (typeof window !== "undefined") {
+      const overrides: Record<string, boolean> = {};
+      for (const h of working.households) {
+        const stored = localStorage.getItem(`ttc:optedIn:${h.id}`);
+        if (stored !== null) overrides[h.id] = stored === "true";
+      }
+      if (Object.keys(overrides).length > 0) {
+        working = {
+          ...working,
+          households: working.households.map((h) =>
+            overrides[h.id] !== undefined ? { ...h, optedIn: overrides[h.id] } : h,
+          ),
+        };
+      }
+    }
+
+    commit(working);
+    setFifoBaseline(deepClone(working));
+    setPhase("post_fifo");
+    setFloatingMoves([]);
+    setActiveQueueAssignmentId(null);
+    setRecentlyAssignedHouseholdId(null);
+    setTtcRound(null);
+    setTtcStage("idle");
+    setIsPaused(false);
+  }
+
   function skipToEnd() {
     runTokenRef.current += 1;
 
@@ -731,6 +796,7 @@ export default function HomePage() {
           onRunFifo={runFifo}
           onRunTtc={runTtc}
           onAdvanceTtc={advanceTtc}
+          onSkipToTtc={skipToTtc}
           onSkipToEnd={skipToEnd}
           onPauseToggle={() => setIsPaused((value) => !value)}
           onSpeedChange={setSpeed}

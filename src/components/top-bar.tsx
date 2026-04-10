@@ -16,6 +16,7 @@ interface TopBarProps {
   onRunFifo: () => void;
   onRunTtc: () => void;
   onAdvanceTtc: () => void;
+  onSkipToTtc: () => void;
   onSkipToEnd: () => void;
   onPauseToggle: () => void;
   onSpeedChange: (speed: number) => void;
@@ -42,6 +43,7 @@ export function TopBar({
   onRunFifo,
   onRunTtc,
   onAdvanceTtc,
+  onSkipToTtc,
   onSkipToEnd,
   onPauseToggle,
   onSpeedChange,
@@ -100,6 +102,18 @@ export function TopBar({
             )}
           >
             Next
+          </button>
+          <button
+            onClick={onSkipToTtc}
+            disabled={phase !== "setup" && phase !== "fifo"}
+            className={cn(
+              "rounded-full px-4 py-2 text-sm font-medium transition",
+              phase === "setup" || phase === "fifo"
+                ? "bg-harbor/80 text-cyan-950 hover:bg-harbor/65"
+                : "cursor-not-allowed bg-slate-200 text-slate-400",
+            )}
+          >
+            Skip to TTC
           </button>
           <button
             onClick={onSkipToEnd}
