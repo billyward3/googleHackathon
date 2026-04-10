@@ -61,9 +61,9 @@ function buildingScale(bedrooms: number) {
 }
 
 function unitCircleSize(bedrooms: number) {
-  if (bedrooms <= 2) return 44;
-  if (bedrooms === 3) return 52;
-  return 58;
+  if (bedrooms <= 2) return 34;
+  if (bedrooms === 3) return 40;
+  return 46;
 }
 
 function HouseGlyph({
@@ -77,7 +77,7 @@ function HouseGlyph({
 }) {
   if (bedrooms >= 4) {
     return (
-      <svg width="46" height="46" viewBox="0 0 48 48" className={cn(active && "drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]")}>
+      <svg width="34" height="34" viewBox="0 0 48 48" className={cn(active && "drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]")}>
         <rect x="10" y="8" width="28" height="30" rx="5" fill="#18263f" />
         <rect x="16" y="3" width="16" height="8" rx="2" fill="#31425d" />
         <rect x="16" y="15" width="5" height="5" rx="1.5" fill="#eef3ff" />
@@ -91,7 +91,7 @@ function HouseGlyph({
   }
   if (bedrooms === 3) {
     return (
-      <svg width="42" height="42" viewBox="0 0 44 44" className={cn(active && "drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]")}>
+      <svg width="30" height="30" viewBox="0 0 44 44" className={cn(active && "drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]")}>
         <path d="M6 22 L22 8 L38 22 V36 H6 Z" fill="#223457" />
         <rect x="10" y="21" width="24" height="15" rx="3" fill="#223457" />
         <rect x="14" y="24" width="5" height="5" rx="1.5" fill="#eef3ff" />
@@ -102,7 +102,7 @@ function HouseGlyph({
     );
   }
   return (
-    <svg width="38" height="38" viewBox="0 0 40 40" className={cn(active && "drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]")}>
+    <svg width="26" height="26" viewBox="0 0 40 40" className={cn(active && "drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]")}>
       <path d="M6 20 L20 9 L34 20 V33 H6 Z" fill="#31517a" />
       <rect x="10" y="22" width="20" height="11" rx="3" fill="#31517a" />
       <rect x="13" y="24" width="4.5" height="4.5" rx="1.5" fill="#eef3ff" />
@@ -277,11 +277,11 @@ function MapOverlay({
       {/* ── SVG layer: TTC arrows ─────────────────────────────────────────── */}
       <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", overflow: "visible" }}>
         <defs>
-          <marker id="cycle-head" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+          <marker id="cycle-head" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+            <polygon points="0 0, 7 2.5, 0 5" fill="#10b981" />
           </marker>
-          <marker id="preference-head" markerWidth="10" markerHeight="7" refX="8" refY="3.5" orient="auto">
-            <polygon points="0 0, 10 3.5, 0 7" fill="#ef4444" />
+          <marker id="preference-head" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+            <polygon points="0 0, 7 2.5, 0 5" fill="#ef4444" />
           </marker>
         </defs>
 
@@ -309,7 +309,7 @@ function MapOverlay({
               }}
               transition={{ duration: 0.55 }}
               stroke="#ef4444"
-              strokeWidth={ttcStage === "preferences" ? 3.5 : 2.5}
+              strokeWidth={ttcStage === "preferences" ? 2 : 1.5}
               fill="none"
               markerEnd="url(#preference-head)"
               strokeLinecap="round"
@@ -330,8 +330,8 @@ function MapOverlay({
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{ pathLength: 1, opacity: ttcStage === "spotlight" ? 0.95 : 1 }}
                 transition={{ duration: 0.7 }}
-                stroke="rgba(16,185,129,0.16)"
-                strokeWidth={ttcStage === "spotlight" ? 16 : 12}
+                stroke="rgba(16,185,129,0.12)"
+                strokeWidth={ttcStage === "spotlight" ? 10 : 7}
                 fill="none"
                 strokeLinecap="round"
               />
@@ -341,7 +341,7 @@ function MapOverlay({
                 animate={{ pathLength: 1, opacity: ttcStage === "spotlight" ? 0.92 : 1 }}
                 transition={{ duration: 0.7 }}
                 stroke="#10b981"
-                strokeWidth={ttcStage === "spotlight" ? 5 : 4}
+                strokeWidth={ttcStage === "spotlight" ? 3 : 2.5}
                 fill="none"
                 markerEnd="url(#cycle-head)"
                 strokeLinecap="round"
@@ -550,6 +550,8 @@ const DETROIT_BOUNDS: LatLngBoundsExpression = [
 ];
 
 export function MapLeaflet(props: MapLeafletProps) {
+  const tileOpacity = props.phase === "ttc" ? 0.45 : props.phase === "complete" ? 0.6 : 0.75;
+
   return (
     <MapContainer
       bounds={DETROIT_BOUNDS}
@@ -561,6 +563,7 @@ export function MapLeaflet(props: MapLeafletProps) {
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        opacity={tileOpacity}
       />
       {/* Small attribution in bottom-right */}
       <ZoomControls bounds={DETROIT_BOUNDS} />

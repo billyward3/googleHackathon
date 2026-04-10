@@ -70,7 +70,7 @@ export function buildSimulationMetrics(
     (acc, result) => {
       if (result.status === "improved") acc.improvedCount += 1;
       if (result.status === "unchanged") acc.unchangedCount += 1;
-      if (result.status === "not_moved") acc.unchangedCount += 1;
+      if (result.status === "not_moved") acc.notMovedCount += 1;
       if (result.status === "opted_out") acc.optedOutCount += 1;
       return acc;
     },

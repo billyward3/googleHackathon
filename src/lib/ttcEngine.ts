@@ -296,12 +296,14 @@ export function finalizeResults(
 
     results[household.id] = {
       householdId: household.id,
-      status: "unchanged",
+      status: household.currentUnitId ? "unchanged" : "not_moved",
       beforeUnitId: before?.currentUnitId ?? null,
       afterUnitId: household.currentUnitId,
       beforeRank,
       afterRank,
-      summary: "Stayed in the current unit because TTC did not find a better trade cycle for this household.",
+      summary: household.currentUnitId
+        ? "Stayed in the current unit because TTC did not find a better trade cycle for this household."
+        : "Still waiting in the queue — no unit was allocated.",
     };
   }
 

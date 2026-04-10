@@ -91,11 +91,10 @@ function swapArrayValue<T>(values: T[], index: number, nextValue: T) {
 }
 
 export default function HomePage() {
-  const [restored] = useState(() => loadSimState());
   const [state, setState] = useState<SimulationState>(() =>
-    restored?.state ?? applyRankingsToState(createInitialState()),
+    applyRankingsToState(createInitialState()),
   );
-  const [phase, setPhase] = useState<SimulationPhase>(restored?.phase ?? "setup");
+  const [phase, setPhase] = useState<SimulationPhase>("setup");
   const [speed, setSpeed] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const [comparisonMode, setComparisonMode] = useState(false);
@@ -104,13 +103,27 @@ export default function HomePage() {
   const [floatingMoves, setFloatingMoves] = useState<FloatingMove[]>([]);
   const [activeQueueAssignmentId, setActiveQueueAssignmentId] = useState<string | null>(null);
   const [recentlyAssignedHouseholdId, setRecentlyAssignedHouseholdId] = useState<string | null>(null);
-  const [fifoBaseline, setFifoBaseline] = useState<SimulationState | null>(restored?.fifoBaseline ?? null);
+  const [fifoBaseline, setFifoBaseline] = useState<SimulationState | null>(null);
   const [ttcRound, setTtcRound] = useState<ReturnType<typeof buildTtcRound> | null>(null);
   const [ttcStage, setTtcStage] = useState<"idle" | "preferences" | "spotlight" | "moving">("idle");
   const [advanceTick, setAdvanceTick] = useState(0);
 
+  // Restore state from sessionStorage after hydration (avoids mismatch)
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    const saved = loadSimState();
+    if (saved) {
+      setState(saved.state);
+      setPhase(saved.phase);
+      if (saved.fifoBaseline) setFifoBaseline(saved.fifoBaseline);
+    }
+  }, []);
+
   // Save state to sessionStorage so navigating to /person and back restores it
   useEffect(() => {
+    if (!restoredRef.current) return;
     saveSimState(state, phase, fifoBaseline);
   }, [state, phase, fifoBaseline]);
 
