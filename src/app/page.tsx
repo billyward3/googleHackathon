@@ -487,6 +487,112 @@ export default function HomePage() {
     setActiveQueueAssignmentId(null);
   }
 
+  function skipToEnd() {
+    runTokenRef.current += 1;
+
+    let working = deepClone(stateRef.current);
+
+    // ── Run all FIFO steps synchronously ──
+    if (!working.fifoComplete) {
+      working = appendLog(working, {
+        phase: "fifo",
+        title: "FIFO begins (skipped)",
+        detail: "FIFO allocation computed instantly.",
+      });
+
+      while (true) {
+        const step = getNextFifoStep(working);
+        if (!step) break;
+
+        const unit = getUnitById(working.units, step.unitId);
+        const original = getHouseholdById(working.households, step.originalOccupantId);
+        const assignee = getHouseholdById(working.households, step.assignedHouseholdId);
+
+        if (!unit || !original || !assignee || step.queueIndex === null) break;
+
+        working = {
+          ...working,
+          households: working.households.map((h) =>
+            h.id === original.id ? { ...h, currentUnitId: null } : h,
+          ),
+          units: working.units.map((u) =>
+            u.id === unit.id ? { ...u, currentOccupantId: null } : u,
+          ),
+        };
+        working = applyFifoStep(working, step);
+      }
+
+      working = { ...working, fifoComplete: true };
+      working = appendLog(working, {
+        phase: "fifo",
+        title: "FIFO complete",
+        detail: "All FIFO allocations applied.",
+      });
+
+      // Apply opt-in overrides
+      if (typeof window !== "undefined") {
+        const overrides: Record<string, boolean> = {};
+        for (const h of working.households) {
+          const stored = localStorage.getItem(`ttc:optedIn:${h.id}`);
+          if (stored !== null) overrides[h.id] = stored === "true";
+        }
+        if (Object.keys(overrides).length > 0) {
+          working = {
+            ...working,
+            households: working.households.map((h) =>
+              overrides[h.id] !== undefined ? { ...h, optedIn: overrides[h.id] } : h,
+            ),
+          };
+        }
+      }
+    }
+
+    const baseline = deepClone(working);
+
+    // ── Run all TTC cycles synchronously ──
+    working = appendLog(working, {
+      phase: "ttc",
+      title: "TTC begins (skipped)",
+      detail: "TTC exchange cycles computed instantly.",
+    });
+
+    const settledIds = new Set<string>();
+    const cycleDetails: Record<string, string> = {};
+
+    while (true) {
+      const round = buildTtcRound(working, settledIds);
+      if (round.activeHouseholdIds.length === 0 || round.cycles.length === 0) break;
+
+      const cycle = round.cycles[0];
+      working = applyTtcCycle(working, cycle);
+
+      for (const householdId of cycle.householdIds) {
+        settledIds.add(householdId);
+        cycleDetails[householdId] = cycle.label;
+      }
+    }
+
+    const results = finalizeResults(baseline, working, cycleDetails);
+    working = { ...working, results, ttcComplete: true };
+
+    const summaryMetrics = buildSimulationMetrics(baseline, working, results);
+    working = appendLog(working, {
+      phase: "ttc",
+      title: "TTC complete",
+      detail: `${summaryMetrics.improvedCount} households improved, ${summaryMetrics.unchangedCount} stayed the same, and ${summaryMetrics.optedOutCount} opted out.`,
+    });
+
+    commit(working);
+    setFifoBaseline(baseline);
+    setPhase("complete");
+    setFloatingMoves([]);
+    setActiveQueueAssignmentId(null);
+    setRecentlyAssignedHouseholdId(null);
+    setTtcRound(null);
+    setTtcStage("idle");
+    setIsPaused(false);
+  }
+
   async function runTtc() {
     if (phase !== "post_fifo" || !fifoBaseline) {
       return;
@@ -625,6 +731,7 @@ export default function HomePage() {
           onRunFifo={runFifo}
           onRunTtc={runTtc}
           onAdvanceTtc={advanceTtc}
+          onSkipToEnd={skipToEnd}
           onPauseToggle={() => setIsPaused((value) => !value)}
           onSpeedChange={setSpeed}
           onComparisonToggle={() => setComparisonMode((value) => !value)}
