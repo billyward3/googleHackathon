@@ -102,7 +102,7 @@ src/
 Track 5: Housing & Urban Development
 Prompt: *"How might we support tenants in navigating housing systems?"*
 
-Built in one day. Repurposes patterns from [career-ops](https://github.com/billyward3/career-ops), an open-source job search automation tool, applying the same profile-based evaluation pipeline to housing search.
+Built in one day. Repurposes patterns from [career-ops]((https://github.com/santifer/career-ops)), an open-source job search automation tool, applying the same profile-based evaluation pipeline to housing search.
 
 ## Verification
 
