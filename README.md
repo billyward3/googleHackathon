@@ -10,8 +10,8 @@ The wizard collects household needs, scores 76 Detroit listings, and lets applic
 
 ### Allocation Engine
 
-Starting from FIFO assignments, TTC finds exchange cycles where every participant moves to a more-preferred unit. No one is worse off, and honest preferences are always optimal (no gamification). The demo ends by zooming in on a household whose rank improved from 34 to 10.
-
+Starting from FIFO assignments, TTC finds exchange cycles where every participant moves to a more-preferred unit. No one is worse off, and honest preferences are always optimal (no gamification). The demo ends by zooming in on the average improvement: going from your 34th ranked house to your 11th ranked house on average (out of 76 totals). This is based on random ranking and includes those who opt out of TTC and stay with their FIFO assignment, so the improvement is significant for those who participate.
+ 
 <img src="docs/media/housing-server.gif" width="100%" alt="TTC allocation simulation with rank improvement">
 
 ## The Problem
