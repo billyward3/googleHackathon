@@ -1,63 +1,47 @@
 # CivicHousing
 
-A two-part civic technology platform built for the **Google x CSG x T4SG 2026 Hackathon** (Track 5: Housing & Urban Development). CivicHousing addresses the challenge of making public housing systems more accessible and transparent for the people who need them most — seniors, disabled individuals, and low-income families in Detroit.
+A civic technology platform that makes public housing allocation accessible and transparent. Built for the **Google x CSG x T4SG 2026 Hackathon** (Track 5: Housing & Urban Development), CivicHousing pairs an accessibility-first intake wizard with an interactive allocation simulation that demonstrates how coordinated exchange algorithms can improve outcomes over simple queue-based systems.
+
+### Tenant Experience
+
+The wizard collects household needs, scores 76 Detroit listings, and lets applicants drag-rank their preferences.
+
+<img src="docs/media/housing-client.gif" width="100%" alt="Housing wizard: survey, scoring, and drag-to-rank">
+
+### Allocation Engine
+
+Starting from FIFO assignments, TTC finds exchange cycles where every participant moves to a more-preferred unit. No one is worse off, and honest preferences are always optimal (no gamification). The demo ends by zooming in on a household whose rank improved from 34 to 10.
+
+<img src="docs/media/housing-server.gif" width="100%" alt="TTC allocation simulation with rank improvement">
 
 ## The Problem
 
-Public housing allocation is opaque, difficult to navigate, and especially inaccessible for vulnerable populations. Applicants face confusing processes, limited visibility into available units, and no way to express meaningful preferences about where they live. Meanwhile, allocation algorithms like FIFO (first-come, first-served) often produce suboptimal outcomes that could be improved through coordinated exchange.
+Public housing allocation is opaque and inaccessible. Applicants face confusing processes, limited visibility into available units, and no way to express preferences about where they live. Meanwhile, first-come-first-served (FIFO) allocation often produces suboptimal matches that could be improved through coordinated exchange.
+
+CivicHousing addresses this by giving applicants a guided, accessible intake process and showing how Top Trading Cycles (TTC) can improve housing outcomes without making anyone worse off.
 
 ## What We Built
 
-### 1. Personalized Housing Realtor (`/realtor`)
+### Personalized Housing Wizard (`/realtor`)
 
-An accessibility-first wizard that acts as a "personal realtor" for public housing applicants. Designed for seniors and disabled users with large touch targets, plain language, and a guided step-by-step flow.
+An accessibility-first wizard designed for seniors and disabled users. Large touch targets, plain language, and a step-by-step flow collect household size, accessibility needs, and location preferences. The system then scores all 76 Detroit housing listings against the applicant's profile and presents ranked results on an interactive Leaflet map with hospitals, transit hubs, schools, and government services. Applicants can drag to reorder their rankings, which feed directly into the allocation simulation.
 
-**How it works:**
-- **Step 1 — Household:** Family size, bedroom needs, pets
-- **Step 2 — Accessibility:** Wheelchair access, senior-friendly layout, stairs tolerance, free-text accommodations
-- **Step 3 — Location:** Public transit importance, parking needs
-- **Step 4 — Review:** Full summary with edit buttons, plus "Talk to a virtual agent" and "Call us" options
+### Allocation Simulation (`/`)
 
-After completing the wizard, the system scores all 76 Detroit housing listings against the applicant's profile and presents ranked results alongside an interactive Leaflet map showing:
-- Numbered listing markers (clickable)
-- Points of interest: hospitals, transit hubs, schools, government services
-- Detailed property cards with demo photos, specs, and match warnings
+An animated visualization comparing two allocation algorithms side by side:
 
-Applicants can **drag to reorder** their rankings, then save and feed their preferences directly into the allocation simulation.
+- **FIFO**: Sequential vacancy filling. Each unit goes to the next eligible household in queue order.
+- **TTC (Top Trading Cycles)**: Starting from the FIFO baseline, households participate in coordinated exchange cycles where everyone moves to a higher-preference unit simultaneously. No one is made worse off.
 
-### 2. Allocation Simulation (`/`)
+The simulation runs on real Detroit housing data (76 units from the One Billion Dollar Affordable Multifamily Housing Construction Sites dataset) with animated step-by-step execution, speed control up to 20x, skip buttons, and a metrics dashboard showing improved/unchanged/opted-out counts.
 
-An interactive visualization comparing two housing allocation algorithms:
+### The Pipeline
 
-- **FIFO (First-In, First-Out):** Sequential vacancy filling — each unit is assigned to the next eligible household in queue order. Simple but often produces suboptimal matches.
-- **TTC (Top Trading Cycles):** Starting from the FIFO baseline, households participate in coordinated exchange cycles where everyone involved moves to a higher-preference unit simultaneously. No one is made worse off.
-
-The simulation runs on real Detroit housing data (76 units from the One Billion Dollar Affordable Multifamily Housing Construction Sites dataset) and demonstrates how TTC can improve outcomes over FIFO.
-
-**Features:**
-- Animated step-by-step FIFO and TTC execution on a Leaflet map
-- Speed control up to 20x for fast demos
-- Skip to TTC / Skip to End buttons for instant computation
-- Metrics dashboard: improved, unchanged, opted out counts with average rank comparisons
-- Click any household or unit for detailed information
-- State persistence — navigate to detail pages and back without losing simulation progress
-
-### 3. The Connection
-
-The realtor wizard's output (ranked preferences + household profile) feeds directly into the first queue entry (Maya Chen) in the allocation simulation. This demonstrates the full pipeline: **accessible intake → personalized ranking → fair allocation**.
+The wizard's output (ranked preferences + household profile) feeds directly into the first queue entry in the allocation simulation, demonstrating the full flow: **accessible intake, personalized ranking, fair allocation**.
 
 ## Tech Stack
 
-- **Next.js 15** (App Router)
-- **React 19** with TypeScript
-- **Tailwind CSS** for styling
-- **Framer Motion** for animations and drag-to-reorder
-- **Leaflet / react-leaflet** for interactive maps
-- **OpenStreetMap** tiles (no API key required)
-
-## Data
-
-Housing data sourced from Detroit's One Billion Dollar Affordable Multifamily Housing Construction Sites, augmented with simulated attributes (accessibility, transit proximity, amenities) for demonstration purposes.
+Next.js 15 · React 19 · TypeScript · Tailwind CSS · Framer Motion · Leaflet · OpenStreetMap
 
 ## Run Locally
 
@@ -66,47 +50,10 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000/realtor](http://localhost:3000/realtor) to start the housing wizard, or [http://localhost:3000](http://localhost:3000) for the allocation simulation.
+Open [localhost:3000/realtor](http://localhost:3000/realtor) for the housing wizard, or [localhost:3000](http://localhost:3000) for the allocation simulation.
 
-## Project Structure
+## Context
 
-```
-src/
-  app/
-    page.tsx                  — Allocation simulation (FIFO + TTC)
-    realtor/page.tsx          — Personalized housing wizard
-    api/listings/             — Housing listings API (serves CSV data as JSON)
-    house/page.tsx            — Unit detail page
-    person/page.tsx           — Household detail page
-  components/
-    realtor/                  — Wizard steps, results panel, map, listing cards
-    map-leaflet.tsx           — Simulation map with TTC visualization
-    family-panel.tsx          — FIFO queue and household list
-    house-panel.tsx           — Unit inspector and metrics
-    top-bar.tsx               — Controls, speed slider, phase display
-  lib/
-    realtor/                  — Scoring engine, API client, rankings persistence
-    fifoEngine.ts             — FIFO vacancy-fill logic
-    ttcEngine.ts              — TTC graph building, cycle detection, settlement
-    metrics.ts                — Before/after comparison metrics
-  data/
-    housingData.ts            — 76 Detroit housing units from CSV
-    seedScenario.ts           — Simulation initialization
-  types/
-    housing.ts                — Domain types
-```
+Built in one day for the Google x CSG x T4SG 2026 Hackathon. Track prompt: *"How might we support tenants in navigating housing systems?"*
 
-## Hackathon Context
-
-**Google x CSG x T4SG 2026 Hackathon**
-Track 5: Housing & Urban Development
-Prompt: *"How might we support tenants in navigating housing systems?"*
-
-Built in one day. Repurposes patterns from [career-ops]((https://github.com/santifer/career-ops)), an open-source job search automation tool, applying the same profile-based evaluation pipeline to housing search.
-
-## Verification
-
-```bash
-npm run lint
-npm run build
-```
+Housing data sourced from Detroit's One Billion Dollar Affordable Multifamily Housing Construction Sites, augmented with simulated attributes for demonstration purposes.
